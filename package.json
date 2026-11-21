@@ -1,0 +1,27 @@
+{
+  "name": "ploc-app-js-sdk",
+  "version": "1.0.0",
+  "description": "Client SDK running inside the PLOC app (scripts & miniapps): reference source, TypeScript types and API catalog.",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PLOC-app/ploc-app-js-sdk.git"
+  },
+  "scripts": {
+    "sync": "node scripts/sync-from-private.mjs",
+    "catalog:build": "node scripts/build-catalog-json.mjs",
+    "check:version": "node scripts/check-version.mjs",
+    "check:public": "node scripts/check-public.mjs",
+    "check:catalog": "node scripts/check-catalog.mjs",
+    "check:types": "node scripts/check-types.mjs",
+    "check": "npm run check:public && npm run check:version && npm run catalog:build && npm run check:catalog && npm run check:types"
+  },
+  "devDependencies": {
+    "typescript": "5.6.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
