@@ -221,13 +221,19 @@ window.SDK_CATALOG = {
         snippet: "const wine = await sdk.cellar.wine.get(\"WINE_ID\");\nreturn wine;"
     },
     "cellar.wine.find": {
-        desc: "Find wines by name (string) or by criteria (object).",
-        params: [{ name: "param", type: "string | object" }],
+        desc: "Find wines with a search text (string, or { query }). The text is matched like the app's search field. Return a Collection.",
+        params: [
+            { name: "param", type: "string | object" },
+            { name: "param.query", type: "string", optional: true }
+        ],
         snippet: "const results = await sdk.cellar.wine.find(\"Margaux\");\nreturn results.map(w => w.name).toArray();"
     },
     "cellar.wine.findFirst": {
-        desc: "Get the first matching wine, or null.",
-        params: [{ name: "param", type: "string | object" }],
+        desc: "Get the first wine matching a search text (string, or { query }), or null.",
+        params: [
+            { name: "param", type: "string | object" },
+            { name: "param.query", type: "string", optional: true }
+        ],
         snippet: "const wine = await sdk.cellar.wine.findFirst(\"Margaux\");\nreturn wine?.name;"
     },
     "cellar.rack.getAll": {
@@ -439,13 +445,21 @@ window.SDK_CATALOG = {
         snippet: "const item = await sdk.cellar.rack.get(\"ID\");\nreturn item;"
     },
     "cellar.rack.find": {
-        desc: "Find racks by name (string) or by criteria (object).",
-        params: [{ name: "param", type: "string | object" }],
+        desc: "Find racks with a search text (string, or { query }), optionally restricted to the racks holding a wine with { wineId }. Return a Collection.",
+        params: [
+            { name: "param", type: "string | object" },
+            { name: "param.query", type: "string", optional: true },
+            { name: "param.wineId", type: "string", optional: true }
+        ],
         snippet: "const results = await sdk.cellar.rack.find(\"NAME\");\nreturn results.toArray();"
     },
     "cellar.rack.findFirst": {
-        desc: "Get the first matching rack, or null.",
-        params: [{ name: "param", type: "string | object" }],
+        desc: "Get the first rack matching a search text (string, or { query }) and optionally { wineId }, or null.",
+        params: [
+            { name: "param", type: "string | object" },
+            { name: "param.query", type: "string", optional: true },
+            { name: "param.wineId", type: "string", optional: true }
+        ],
         snippet: "const item = await sdk.cellar.rack.findFirst(\"NAME\");\nreturn item;"
     },
     "cellar.document.getAll": {
@@ -487,13 +501,21 @@ window.SDK_CATALOG = {
         snippet: "const item = await sdk.cellar.document.findFirst({ parentId: \"PARENT_ID\" });\nreturn item;"
     },
     "cellar.tastingNotes.find": {
-        desc: "Find tasting notes by criteria (object), e.g. by wineId. Return a Collection.",
-        params: [{ name: "param", type: "object" }],
+        desc: "Find tasting notes with a search text (string, or { query }), optionally restricted to a wine with { wineId }. Return a Collection.",
+        params: [
+            { name: "param", type: "string | object" },
+            { name: "param.query", type: "string", optional: true },
+            { name: "param.wineId", type: "string", optional: true }
+        ],
         snippet: "const results = await sdk.cellar.tastingNotes.find({ wineId: \"WINE_ID\" });\nreturn results.toArray();"
     },
     "cellar.tastingNotes.findFirst": {
-        desc: "Get the first tasting note matching criteria (object), or null.",
-        params: [{ name: "param", type: "object" }],
+        desc: "Get the first tasting note matching a search text (string, or { query }) and optionally { wineId }, or null.",
+        params: [
+            { name: "param", type: "string | object" },
+            { name: "param.query", type: "string", optional: true },
+            { name: "param.wineId", type: "string", optional: true }
+        ],
         snippet: "const item = await sdk.cellar.tastingNotes.findFirst({ wineId: \"WINE_ID\" });\nreturn item;"
     },
 
