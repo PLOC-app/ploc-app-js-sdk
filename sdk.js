@@ -2176,6 +2176,27 @@ class Wine extends Model {
         return null;
     }
 
+    _requireId() {
+        if (!this.id) {
+            throw new SDKError(SDK_ERROR_CODES.INVALID_PARAMS, "The wine must be saved first (no id)");
+        }
+    }
+
+    async getRacks() {
+        this._requireId();
+        return Rack.find({ wineId: this.id });
+    }
+
+    async getTastingNotes() {
+        this._requireId();
+        return TastingNotes.find({ wineId: this.id });
+    }
+
+    async getOrders() {
+        this._requireId();
+        return Order.find({ wineId: this.id });
+    }
+
     get image() {
         return this._image ?? null;
     }

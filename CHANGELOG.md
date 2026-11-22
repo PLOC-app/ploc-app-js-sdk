@@ -6,8 +6,11 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Added
+- `Wine#getRacks()`, `Wine#getTastingNotes()` and `Wine#getOrders()` return the racks, tasting notes and orders of a wine (each a `Collection`). They use `find({ wineId })` and throw `INVALID_PARAMS` if the wine has no id.
+
 ### Changed
-- `sdk.cellar.wine.find`, `sdk.cellar.tastingNotes.find` and `sdk.cellar.rack.find` take a search `query` (a string, or `{ query }`) instead of a `name`, and match like the app's search field. `tastingNotes.find` and `rack.find` still accept `{ wineId }`.
+- `sdk.cellar.wine.find`, `sdk.cellar.tastingNotes.find` and `sdk.cellar.rack.find` take a search `query` (a string, or `{ query }`) instead of a `name`, and match like the app's search field. `tastingNotes.find` and `rack.find` also accept `{ wineId }`, alone or with `query`, to restrict to one wine.
 
 ## [1.0.0] - 2026-11-21
 
