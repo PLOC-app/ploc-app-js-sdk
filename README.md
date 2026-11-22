@@ -16,7 +16,7 @@ The PLOC app **injects the SDK for you**: there is nothing to install or bundle.
 
 ## Hello PLOC
 
-In a script, `sdk` is already available:
+In a script or a mini app, `sdk` is already available (the app injects it):
 
 ```js
 const info = await sdk.cellar.getInfo();
@@ -26,13 +26,17 @@ await sdk.dialog.toast(`${wines.count} wine(s) out of ${info.counts.wines}`);
 return wines.map(w => w.name).toArray();
 ```
 
-In a mini app, create the instance yourself:
+Use it directly: do not declare `sdk` yourself (`const sdk = ...`), it is already declared and the page would fail to load.
+
+`sdk` is also available as `window.sdk` / `globalThis.sdk`.
+
+Outside PLOC (a regular browser), `sdk` does not exist, so guard with `typeof sdk === "undefined"`. A page that loads `sdk.js` itself (local development, tests) creates the instance:
 
 ```js
-const sdk = new SDK(new Authorization());
+globalThis.sdk = new SDK(new Authorization());
 ```
 
-Outside PLOC (a regular browser), the SDK falls back to a mock gateway: `sdk.isMock` is `true` and native calls are not available.
+The SDK then falls back to a mock gateway: `sdk.isMock` is `true` and native calls are not available.
 
 ## Services
 
