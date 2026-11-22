@@ -213,6 +213,15 @@ class Logger {
 
 const _logger = new Logger();
 
+/**
+ * Error thrown (rejected) by SDK calls: always await them inside try / catch.
+ * `code` is one of SDK_ERROR_CODES: INVALID_PARAMS (missing or malformed argument,
+ * checked before anything is sent), TIMEOUT, NOT_FOUND, NO_BRIDGE / NO_SDK (outside the
+ * PLOC app) or INTERNAL_ERROR.
+ *
+ * Not every failure throws: some methods resolve `null` when the app returns nothing.
+ * Check for `null` as well as catching.
+ */
 class SDKError extends Error {
     constructor(code, message) {
         super(message);
@@ -395,6 +404,10 @@ class UIService {
         return _gateway.send("uiShare", params);
     }
 
+    /**
+     * Share local files by path.
+     * @throws {SDKError} INVALID_PARAMS if no path is given.
+     */
     async shareFiles(params) {
         const paths = (Array.isArray(params) ? params : [params])
             .filter(path => typeof path === "string" && path !== "");
@@ -406,6 +419,9 @@ class UIService {
         return _gateway.send("uiShare", { paths });
     }
 
+    /**
+     * @throws {SDKError} INVALID_PARAMS if `base64` is missing or empty.
+     */
     async shareImage(params) {
         if (!params || typeof params.base64 !== "string" || params.base64 === "") {
             throw new SDKError(SDK_ERROR_CODES.INVALID_PARAMS, "shareImage requires base64");
@@ -414,6 +430,9 @@ class UIService {
         return _gateway.send("uiShare", { base64: params.base64 });
     }
 
+    /**
+     * @throws {SDKError} INVALID_PARAMS if the text is missing or empty.
+     */
     async shareText(params) {
         const text = typeof params === "string" ? params : params?.text;
 
@@ -515,6 +534,10 @@ function _assertTimeout(method, timeout) {
 }
 
 class NetworkService {
+    /**
+     * Resolve `null` on failure.
+     * @throws {SDKError} INVALID_PARAMS without `url` or with an invalid `timeout`; TIMEOUT when it expires.
+     */
     async fetchBase64(params) {
         params = _normalizeParams(params, "url");
 
@@ -527,6 +550,10 @@ class NetworkService {
         return _gateway.send("networkBase64", { url: params.url }, params.timeout);
     }
 
+    /**
+     * Stream a URL to a local file. Resolve `null` on failure.
+     * @throws {SDKError} INVALID_PARAMS without `url`.
+     */
     async download(params) {
         params = _normalizeParams(params, "url");
 
@@ -539,6 +566,10 @@ class NetworkService {
         return file ? { path: file.path, size: file.size } : null;
     }
 
+    /**
+     * Default method is GET, `body` must be a string. Resolve `null` on failure.
+     * @throws {SDKError} INVALID_PARAMS without `url`, with a non-string `method` or `body`, or an invalid `timeout`; TIMEOUT when it expires.
+     */
     async request(params) {
         params = _normalizeParams(params, "url");
 
@@ -566,6 +597,10 @@ class NetworkService {
             : null;
     }
 
+    /**
+     * Stream a local file to a URL (default method PUT). Resolve `null` on failure.
+     * @throws {SDKError} INVALID_PARAMS without `path` or `url`.
+     */
     async upload(params) {
         if (!params || !params.path || !params.url) {
             throw new SDKError(SDK_ERROR_CODES.INVALID_PARAMS, "upload requires path and url");
@@ -590,6 +625,9 @@ class DialogService {
         return result ?? null;
     }
 
+    /**
+     * @throws {SDKError} INVALID_PARAMS if the text is missing or empty.
+     */
     async toast(params) {
         params = _normalizeParams(params, "text");
 
@@ -850,6 +888,10 @@ class TranslationsService {
 }
 
 class FilesService {
+    /**
+     * Resolve `null` on failure.
+     * @throws {SDKError} INVALID_PARAMS without `path` or `base64`.
+     */
     async writeBase64(params, base64) {
         if (typeof params === "string") {
             params = { path: params, base64 };
@@ -865,6 +907,10 @@ class FilesService {
         return file ? { path: file.path, size: file.size } : null;
     }
 
+    /**
+     * Resolve `null` on failure.
+     * @throws {SDKError} INVALID_PARAMS without `path` or `text`.
+     */
     async writeText(params, text) {
         if (typeof params === "string") {
             params = { path: params, text };
@@ -878,6 +924,10 @@ class FilesService {
         return this.writeBase64({ path: params.path, base64: _utf8ToBase64(params.text) });
     }
 
+    /**
+     * Resolve `null` when the file cannot be read.
+     * @throws {SDKError} INVALID_PARAMS without `path`.
+     */
     async readBase64(params) {
         params = _normalizeParams(params, "path");
 
@@ -888,12 +938,19 @@ class FilesService {
         return (await _gateway.send("filesRead", { path: params.path })) ?? null;
     }
 
+    /**
+     * Resolve `null` when the file cannot be read.
+     * @throws {SDKError} INVALID_PARAMS without `path`.
+     */
     async readText(params) {
         const base64 = await this.readBase64(params);
 
         return base64 === null ? null : _base64ToUtf8(base64);
     }
 
+    /**
+     * @throws {SDKError} INVALID_PARAMS without `path`.
+     */
     async exists(params) {
         params = _normalizeParams(params, "path");
 
@@ -904,6 +961,9 @@ class FilesService {
         return (await _gateway.send("filesExists", { path: params.path })) === true;
     }
 
+    /**
+     * @throws {SDKError} INVALID_PARAMS without `path`.
+     */
     async delete(params) {
         params = _normalizeParams(params, "path");
 
@@ -979,6 +1039,9 @@ class StorageService {
         }
     }
 
+    /**
+     * @throws {SDKError} INVALID_PARAMS if the key is empty or longer than 128 characters, or the value is not JSON-serializable.
+     */
     async set(key, value) {
         _assertStorageKey("set", key);
 
@@ -1011,6 +1074,9 @@ function _assertStorageKey(method, key) {
 }
 
 class ClipboardService {
+    /**
+     * @throws {SDKError} INVALID_PARAMS without text.
+     */
     async copy(params) {
         const { text } = _normalizeParams(params, "text");
 
@@ -1858,6 +1924,7 @@ class Wine extends Model {
             this.drinkPeriod = new Period(data.drinkPeriod);
         }
 
+        // Serving temperature range in °C (from = min, to = max). Not a date range, unlike apogee and drinkPeriod.
         if (data.service && typeof data.service === "object") {
             this.service = new Period(data.service);
         }
