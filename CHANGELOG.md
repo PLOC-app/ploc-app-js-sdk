@@ -6,6 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and 
 
 ## [Unreleased]
 
+### Changed
+- `sdk.cellar.wine.find`, `sdk.cellar.tastingNotes.find` and `sdk.cellar.rack.find` take a search `query` (a string, or `{ query }`) instead of a `name`, and match like the app's search field. `tastingNotes.find` and `rack.find` still accept `{ wineId }`.
+
 ## [1.0.0] - 2026-11-21
 
 Requires PLOC 7.0 or later.

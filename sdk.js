@@ -1259,13 +1259,19 @@ class Model {
         return results.first ?? null;
     }
 
+    // Key used for the string shorthand of find("text"): "name" by default, "query" for the
+    // models searched through the app's finder (Wine, TastingNotes).
+    static get _findKey() {
+        return "name";
+    }
+
     static async find(param) {
         const className = this.name;
 
         let params;
 
         if (typeof param === "string") {
-            params = { name: param };
+            params = { [this._findKey]: param };
         } else if (param && typeof param === "object") {
             params = param;
         } else {
@@ -1789,6 +1795,10 @@ class Parameter extends Model {
 }
 
 class Wine extends Model {
+    static get _findKey() {
+        return "query";
+    }
+
     _assign(data) {
         super._assign(data);
 
@@ -2436,6 +2446,10 @@ class ReadOnlyModel extends Model {
 }
 
 class TastingNotes extends Model {
+    static get _findKey() {
+        return "query";
+    }
+
     static MOOD = Object.freeze({
         NONE: 0,
         NASTY: 1,
@@ -2634,6 +2648,10 @@ class TastingNotes extends Model {
 }
 
 class Rack extends Model {
+    static get _findKey() {
+        return "query";
+    }
+
     static GRID_LABEL = Object.freeze({
         NONE: 0,
         BOTH_LETTER: 2,
