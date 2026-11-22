@@ -687,6 +687,12 @@ declare class Wine extends Model {
     getOwner(): Promise<Owner | null>;
     getImage(): Promise<Document | null>;
     getCoverImage(): Promise<Document | null>;
+    /** Racks holding this wine. Throws `INVALID_PARAMS` if the wine has no id. */
+    getRacks(): Promise<Collection<Rack>>;
+    /** Tasting notes of this wine. Throws `INVALID_PARAMS` if the wine has no id. */
+    getTastingNotes(): Promise<Collection<TastingNotes>>;
+    /** Orders (purchases) of this wine. Throws `INVALID_PARAMS` if the wine has no id. */
+    getOrders(): Promise<Collection<Order>>;
 }
 
 declare class Order extends Model {

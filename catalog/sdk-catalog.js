@@ -917,6 +917,18 @@ window.SDK_CATALOG = {
         desc: "Get the image of the wine as a Document (null if none).",
         snippet: "const wine = await sdk.cellar.wine.findFirst(\"Margaux\");\nconst image = await wine.getImage();\nreturn image?.filename;"
     },
+    "Wine#getRacks": {
+        desc: "Get the racks holding this wine as a Collection. Throws INVALID_PARAMS if the wine has no id.",
+        snippet: "const wine = await sdk.cellar.wine.findFirst(\"Margaux\");\nconst racks = await wine.getRacks();\nreturn racks.map(r => r.name).toArray();"
+    },
+    "Wine#getTastingNotes": {
+        desc: "Get the tasting notes of this wine as a Collection. Throws INVALID_PARAMS if the wine has no id.",
+        snippet: "const wine = await sdk.cellar.wine.findFirst(\"Margaux\");\nconst notes = await wine.getTastingNotes();\nreturn notes.count;"
+    },
+    "Wine#getOrders": {
+        desc: "Get the orders (purchases) of this wine as a Collection. Throws INVALID_PARAMS if the wine has no id.",
+        snippet: "const wine = await sdk.cellar.wine.findFirst(\"Margaux\");\nconst orders = await wine.getOrders();\nreturn orders.count;"
+    },
     "Wine#getCoverImage": {
         desc: "Get the cover image of the wine as a Document (null if none).",
         snippet: "const wine = await sdk.cellar.wine.findFirst(\"Margaux\");\nconst cover = await wine.getCoverImage();\nreturn cover?.filename;"
