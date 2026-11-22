@@ -1,0 +1,68 @@
+name: Release
+
+# On every push to main: if the version declared in sdk.js has no tag yet, tag it and publish the release.
+# Bumping the version in sdk.js (SDK.version) is what triggers a release; other merges do nothing.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Check
+        run: npm run check
+      - name: catalog.json is up to date
+        run: git diff --exit-code -- catalog/catalog.json
+
+      - name: Read the version from sdk.js
+        id: version
+        run: |
+          version="$(sed -nE 's/^SDK\.version = "([^"]+)";.*/\1/p' sdk.js)"
+          test -n "$version" || { echo "SDK.version not found in sdk.js"; exit 1; }
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$version" >/dev/null; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "v$version is already released: nothing to do."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Extract release notes from CHANGELOG
+        if: steps.version.outputs.exists == 'false'
+        run: |
+          awk -v v="${{ steps.version.outputs.version }}" '
+            index($0, "## [" v "]") == 1 { found=1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+          test -s release-notes.md || { echo "No CHANGELOG entry for ${{ steps.version.outputs.version }}"; exit 1; }
+
+      - name: Tag and publish the release
+        if: steps.version.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag="v${{ steps.version.outputs.version }}"
+          gh release create "$tag" \
+            --target "$GITHUB_SHA" \
+            --title "PLOC SDK $tag" \
+            --notes-file release-notes.md \
+            sdk.js types/sdk.d.ts types/sdk-scripts.d.ts catalog/catalog.json
